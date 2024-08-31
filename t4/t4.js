@@ -771,3 +771,45 @@ const restaurants = [
 ];
 
 // your code here
+const x = document.querySelector('#target');
+
+function getPosition() {
+  // Simple wrapper
+  return new Promise((res, rej) => {
+    navigator.geolocation.getCurrentPosition(res, rej);
+  });
+}
+
+function calc(position, restaurants) {
+  const x = parseFloat(position.coords.latitude);
+  const y = parseFloat(position.coords.longitude);
+  const x2 = parseFloat(restaurants.location.coordinates[1]);
+  const y2 = parseFloat(restaurants.location.coordinates[0]);
+
+  const equat = Math.sqrt(Math.pow(x2 - x, 2) + Math.pow(y2 - y, 2), 2);
+  console.log(restaurants.name, equat);
+  return equat;
+}
+
+if (navigator.geolocation) {
+  (async () => {
+    await getPosition().then(position => {
+      restaurants.sort((a, b) => calc(position, a) - calc(position, b));
+
+      for (const restaurant of restaurants) {
+        const nimi = document.createElement('td');
+        nimi.innerText = restaurant.name;
+
+        const osoite = document.createElement('td');
+        osoite.innerText = restaurant.address;
+
+        const rivi = document.createElement('tr');
+        rivi.append(nimi, osoite);
+
+        kohde.append(rivi);
+      }
+    });
+  })();
+}
+
+const kohde = document.querySelector('tbody');
